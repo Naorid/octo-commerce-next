@@ -1,26 +1,31 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import { useRouter} from 'next/router';
-import { Router } from 'next/router'
 import Link from "next/link";
+import Image from "next/image";
 
-export default () => {
+export async function getServerSideProps(context) {
+    const rawProduct = await fetch(`http://localhost:3000/api/product/${context.query.id}`)
+    if (!rawProduct.ok) {
+        return {props: {}}
+    }
+    const productJson = await rawProduct.json()
+    const product = productJson.data
+
+    return {
+        props: {product}
+    }
+}
+
+export default function Page({ product }) {
     const router = useRouter()
     const { id } = router.query
-
-    const [product, setProduct] = useState([])
-
-    useEffect( () => {
-        if (!router.isReady) return
-        fetch(`http://localhost:3000/api/product/${id}`)
-            .then(response => response.json())
-            .then(data => console.log(data.data) & setProduct(data.data))
-    }, [])
 
     return (
         <div>
             <h1>Product: id={id}</h1>
+            <p>Title: {product.title}</p>
 
-            <p>Name: {product.name}</p>
+            <img width="300" height="300" src={product.image}></img>
 
             <Link href="/">
                 <a>Home</a>

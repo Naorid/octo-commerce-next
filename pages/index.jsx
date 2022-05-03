@@ -1,15 +1,19 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import Link from "next/link";
 
-export default () => {
-    const [products, setProducts] = useState([])
+export async function getServerSideProps(context) {
+    const rawProducts = await fetch(`http://localhost:3000/api/products`)
+    if (!rawProducts.ok) {
+        return {props: {}}
+    }
+    const products = (await rawProducts.json()).data
 
-    useEffect( () => {
-        fetch(`http://localhost:3000/api/products`)
-            .then(response => response.json())
-            .then(data => console.log(data.data) & setProducts(data.data))
-    }, [])
+    return {
+        props: {products}
+    }
+}
 
+export default function Page({ products }) {
     return (
         <div>
             <h1>Index Page</h1>
