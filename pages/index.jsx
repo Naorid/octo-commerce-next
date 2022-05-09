@@ -1,6 +1,17 @@
-import {Box, Container, Heading, SimpleGrid, Text, VStack, Image, Link, Divider, Stack} from '@chakra-ui/react'
+import {
+    Box,
+    Container,
+    Heading,
+    SimpleGrid,
+    Text,
+    VStack,
+    Image,
+    Link,
+} from '@chakra-ui/react'
+import Header from "../src/components/Header";
+import Footer from "../src/components/Footer"
 
-export async function getServerSideProps(context) {
+export async function getStaticProps(context) {
     const rawProducts = await fetch(`http://localhost:3000/api/products`)
     if (!rawProducts.ok) {
         return {props: {}}
@@ -16,10 +27,7 @@ export default function Page({ products }) {
     return (
         <Container>
             <VStack spacing={5}>
-                <Box></Box>
-                <Heading>Accueil</Heading>
-
-                <Text>{"<Inserer Description>"}</Text>
+                <Header></Header>
 
                 <SimpleGrid
                     columns={2}
@@ -38,19 +46,19 @@ export default function Page({ products }) {
                                 <Link href={"/product/" + product.id}>
                                     {product.title}
                                 </Link>
+                                <Box>
+                                    {product.price}
+                                    <Box m={1} as='span' color='gray.600' fontSize='sm'>
+                                        €
+                                    </Box>
+                                </Box>
                             </Box>
                         </Box>
                     ))}
                 </SimpleGrid>
             </VStack>
 
-
-            <VStack
-                py='8'
-                spacing={5}>
-                <Divider></Divider>
-                <Text>Footer</Text>
-            </VStack>
+            <Footer></Footer>
         </Container>
     )
 }

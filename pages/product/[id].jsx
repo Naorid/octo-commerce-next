@@ -1,7 +1,9 @@
 import React from 'react'
 import { useRouter} from 'next/router';
 import Link from "next/link";
-import Image from "next/image";
+import {Box, Button, Container, Heading, HStack, Text, VStack} from "@chakra-ui/react";
+import Header from "../../src/components/Header";
+import Footer from "../../src/components/Footer";
 
 export async function getServerSideProps(context) {
     const rawProduct = await fetch(`http://localhost:3000/api/product/${context.query.id}`)
@@ -21,15 +23,31 @@ export default function Page({ product }) {
     const { id } = router.query
 
     return (
-        <div>
-            <h1>Product: id={id}</h1>
-            <p>Title: {product.title}</p>
+        <Container>
+            <VStack spacing={5}>
+                <Header></Header>
 
-            <img width="300" height="300" src={product.image}></img>
+                <HStack spacing={5}>
+                    <img width="300" height="300" src={product.image}></img>
 
-            <Link href="/">
-                <a>Home</a>
-            </Link>
-        </div>
+                    <VStack>
+                        <Heading as='h5'>{product.title}</Heading>
+                        <Box>
+                            {product.price}
+                            <Box m={1} as='span' color='gray.600' fontSize='sm'>
+                                €
+                            </Box>
+                        </Box>
+                        <Text>{product.description}</Text>
+                    </VStack>
+                </HStack>
+
+                <Link href="/">
+                    <Button>Home</Button>
+                </Link>
+
+                <Footer></Footer>
+            </VStack>
+        </Container>
     )
 }
