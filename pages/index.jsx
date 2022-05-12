@@ -6,10 +6,12 @@ import {
     Text,
     VStack,
     Image,
-    Link,
+    Link, Flex,
 } from '@chakra-ui/react'
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer"
+import {ProductGrid} from "../src/components/ProductGrid";
+import {ProductCard} from "../src/components/ProductCard";
 
 export async function getStaticProps(context) {
     const rawProducts = await fetch(`http://localhost:3000/api/products`)
@@ -26,39 +28,32 @@ export async function getStaticProps(context) {
 export default function Page({ products }) {
     return (
         <Container>
-            <VStack spacing={5}>
+             <VStack spacing={5}>
                 <Header></Header>
 
-                <SimpleGrid
-                    columns={2}
-                    spacing={8}>
-                    {products.map(product => (
-                        <Box
-                            key={product.id}
-                            boxShadow='md'
-                            rounded='lg'
-                            overflow='hidden'
-                            borderWidth='1px'
-                            bg='gray.50'>
-                            <Image src={product.image} boxSize='250px' objectFit='cover'></Image>
+                <Box
+                    maxW="7xl"
+                    mx="auto"
+                    px={{
+                        base: '4',
+                        md: '8',
+                        lg: '12',
+                    }}
+                    py={{
+                        base: '6',
+                        md: '8',
+                        lg: '12',
+                    }}
+                >
+                    <ProductGrid>
+                        {products.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                    </ProductGrid>
+                </Box>
+                 <Footer></Footer>
 
-                            <Box p='4'>
-                                <Link href={"/product/" + product.id}>
-                                    {product.title}
-                                </Link>
-                                <Box>
-                                    {product.price}
-                                    <Box m={1} as='span' color='gray.600' fontSize='sm'>
-                                        €
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box>
-                    ))}
-                </SimpleGrid>
-            </VStack>
-
-            <Footer></Footer>
-        </Container>
+             </VStack>
+         </Container>
     )
 }

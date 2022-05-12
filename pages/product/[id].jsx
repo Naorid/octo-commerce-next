@@ -31,7 +31,7 @@ export default function Page({ product }) {
                     <img width="300" height="300" src={product.image}></img>
 
                     <VStack>
-                        <Heading as='h5'>{product.title}</Heading>
+                        <Heading as='h5'>{product.name}</Heading>
                         <Box>
                             {product.price}
                             <Box m={1} as='span' color='gray.600' fontSize='sm'>
