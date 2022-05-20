@@ -16,6 +16,18 @@ import { Rating } from './Rating'
 import { FavouriteButton } from './FavouriteButton'
 import { PriceTag } from './PriceTag'
 
+async function addProductToCart(productId) {
+    // call addProductToCart
+    fetch("http://localhost:3000/api/addProductToCart.js",
+        {
+            method: 'POST',
+            body: {
+                productId: productId,
+                cartId: localStorage.getItem('cartId')
+            }
+        })
+}
+
 export const ProductCard = (props) => {
     const { product, rootProps } = props
     const { name, image, compare_at_price, price, rating } = product

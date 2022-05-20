@@ -1,7 +1,7 @@
 import nc from 'next-connect'
 import products from '../../../src/data/data'
 import {shopifyCall} from "../../../src/utils/apicall";
-import {shopifyFormat} from "../../../src/utils/productFormat";
+import {shopifyProductFormat} from "../../../src/utils/dataFormats";
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         }
         const shopifyProduct = (await rawProduct.json()).product
 
-        const product = shopifyFormat(shopifyProduct)
+        const product = shopifyProductFormat(shopifyProduct)
         res.json({data: product})
     }
 }

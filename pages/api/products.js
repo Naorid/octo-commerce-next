@@ -1,9 +1,8 @@
-import nc from 'next-connect'
-import cors from 'cors'
 import {shopifyCall} from "../../src/utils/apicall";
-import {shopifyFormat} from "../../src/utils/productFormat"
+import {shopifyProductFormat} from "../../src/utils/dataFormats"
+import {config} from "dotenv"
 
-require('dotenv').config()
+config()
 
 export default async function handler(req, res) {
     const rawProducts = await shopifyCall('products.json')
@@ -17,6 +16,6 @@ export default async function handler(req, res) {
     const shopifyProducts = (await rawProducts.json()).products
     console.log(shopifyProducts[0])
 
-    const products = shopifyProducts.map(shopifyFormat)
+    const products = shopifyProducts.map(shopifyProductFormat)
     res.json({data: products})
 }

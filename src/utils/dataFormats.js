@@ -1,4 +1,4 @@
-export const shopifyFormat = (product) => {
+export const shopifyProductFormat = (product) => {
     return {
         id: product.id,
         name: product.title,
@@ -6,5 +6,13 @@ export const shopifyFormat = (product) => {
         price: product.variants[0].price,
         compare_at_price: product.variants[0].compare_at_price,
         description: product.body_html
+    }
+}
+
+export const shopifyCartFormat = (cart) => {
+    return {
+        id: cart.id,
+        lines: cart.lines,
+        estimated_cost: cart.estimatedCost
     }
 }

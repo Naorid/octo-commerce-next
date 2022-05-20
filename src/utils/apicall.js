@@ -9,3 +9,17 @@ export async function shopifyCall(endpoint) {
         }
     )
 }
+
+export async function shopifyGraphQL(content) {
+    return await fetch(
+        `${process.env.SHOPIFY_DOMAIN}/api/${process.env.API_VERSION}/graphql.json`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/graphql',
+                'X-Shopify-Storefront-Access-Token': process.env.STOREFRONT_ACCESS_TOKEN
+            },
+            body: content
+        }
+    )
+}
