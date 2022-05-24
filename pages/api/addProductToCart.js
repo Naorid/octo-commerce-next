@@ -84,9 +84,9 @@ async function addProductToCart(cartId, productVariantId) {
     }
 
     // Add line with product Id
-    const rawResult = await shopifyGraphQL(`mutation {
+    const rawResult = await shopifyGraphQL( `mutation {
             cartLinesAdd(
-                cartId: "${cartId}",
+                cartId: "gid://shopify/Cart/${cartId}",
                 lines: {
                     merchandiseId: "${productVariantId}",
                     quantity: 1
@@ -112,7 +112,8 @@ async function addProductToCart(cartId, productVariantId) {
             }
         }`)
     const result = await rawResult.json()
-    return result.data.cartLinesAdd !== undefined
+    console.log('addProductToCartResult=', result)
+    return result.data !== undefined && result.data.cartLinesAdd !== undefined
 }
 
 /*
@@ -124,14 +125,14 @@ Body :
  */
 
 export default async function handler(req, res) {
-    const productId = (await JSON.parse(req.body)).productId
-    let cartId = (await JSON.parse(req.body)).cartId
+    const productId = req.body.productId //(await JSON.parse(req.body)).productId
+    let cartId = req.body.cartId //(await JSON.parse(req.body)).cartId
 
     if (req.method !== 'POST' || productId === undefined) {
         res.end()
         return {props: {}}
-    }
 
+    }
     // Get product variants from req
     const rawProductVariants = await shopifyGraphQL(
         `
@@ -152,13 +153,13 @@ export default async function handler(req, res) {
     )
     const productVariantId = (await rawProductVariants.json()).data.node.variants.edges[0].node.id
 
-    // const cartId = localStorage.getItem('cartId')
+    // const cartId = .getItem('cartId')
     // const cartId = "gid://shopify/Cart/2b1630b1c5127af8e447b6ba2d773106"
     // const cartId = undefined
 
     // Does it have a cart id ?
 
-    if (cartId === undefined) {
+    if (cartId === undefined || cartId === 'null') {
         console.log("No cart : Creating one...")
         cartId = (await createCart(productVariantId)).id
     }
@@ -168,6 +169,7 @@ export default async function handler(req, res) {
         if (await addProductToCart(cartId, productVariantId)) {
             console.log("Line Added !")
         }
+        cartId = `gid://shopify/Cart/${cartId}`
     }
 
     res.json({data: cartId})

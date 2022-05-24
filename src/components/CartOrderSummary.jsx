@@ -23,13 +23,18 @@ const OrderSummaryItem = (props) => {
     )
 }
 
-export const CartOrderSummary = () => {
+export const CartOrderSummary = (props) => {
+    const {
+        estimated_cost
+    } = props
+    const subtotal = estimated_cost.subtotalAmount.amount
+    const total = estimated_cost.totalAmount.amount
     return (
         <Stack spacing="8" borderWidth="1px" rounded="lg" padding="8" width="full">
             <Heading size="md">Order Summary</Heading>
 
             <Stack spacing="6">
-                <OrderSummaryItem label="Subtotal" value={formatPrice(597)} />
+                <OrderSummaryItem label="Subtotal" value={formatPrice(subtotal)} />
                 <OrderSummaryItem label="Shipping + Tax">
                     <Link href="#" textDecor="underline">
                         Calculate shipping
@@ -45,7 +50,7 @@ export const CartOrderSummary = () => {
                         Total
                     </Text>
                     <Text fontSize="xl" fontWeight="extrabold">
-                        {formatPrice(597)}
+                        {formatPrice(total)}
                     </Text>
                 </Flex>
             </Stack>

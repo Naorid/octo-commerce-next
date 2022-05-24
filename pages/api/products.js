@@ -14,7 +14,6 @@ export default async function handler(req, res) {
     }
 
     const shopifyProducts = (await rawProducts.json()).products
-    console.log(shopifyProducts[0])
 
     const products = shopifyProducts.map(shopifyProductFormat)
     res.json({data: products})

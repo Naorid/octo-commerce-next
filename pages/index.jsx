@@ -6,7 +6,7 @@ import {
     Text,
     VStack,
     Image,
-    Link, Flex,
+    Link, Flex, Button,
 } from '@chakra-ui/react'
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer"
@@ -30,6 +30,9 @@ export default function Page({ products }) {
         <Container>
              <VStack spacing={5}>
                 <Header></Header>
+                <Link href='/cart'>
+                    <Button>Panier</Button>
+                </Link>
 
                 <Box
                     maxW="7xl"

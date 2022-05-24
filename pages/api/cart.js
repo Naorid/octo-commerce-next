@@ -6,7 +6,7 @@ import {shopifyCartFormat} from "../../src/utils/dataFormats";
 export default async function handler(req, res) {
     const cartId = req.query.cartId
 
-    if (cartId === undefined) {
+    if (cartId === undefined || cartId == "null") {
         res.end()
         return {props: {}}
     }
@@ -71,6 +71,8 @@ export default async function handler(req, res) {
         )
 
     const shopifyCart = (await rawCart.json()).data.cart
+    console.log('shopifyCart=', shopifyCart)
+    console.log('lines=', shopifyCart.lines.edges)
 
     const cart = shopifyCartFormat(shopifyCart)
     res.json({data: cart})

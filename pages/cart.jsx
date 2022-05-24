@@ -3,35 +3,102 @@ import {useEffect, useState} from "react";
 import {CartItem} from "../src/components/CartItem";
 import {CartOrderSummary} from "../src/components/CartOrderSummary";
 
-async function createCart() {
-    await fetch(`http://localhost:3000/api/addProductToCart`,
-        {
-            method: 'POST',
-            // headers: {
-            //     'content-type': 'application/json',
-            // },
-            body: `{
-                "id": "7602169348308"
-            }`
-        }
-    )
+export async function getStaticProps(context) {
+    const rawProducts = await fetch(`http://localhost:3000/api/products`)
+    if (!rawProducts.ok) {
+        return {props: {}}
+    }
+    const products = (await rawProducts.json()).data
+
+    return {
+        props: {products}
+    }
 }
 
-export default function Cart() {
+async function productFromVariant(variantId) {
+    const rawProduct = await fetch(`http://localhost:3000/api/productFromVariant?variantId=${variantId}`)
+
+    if (!rawProduct.ok) {
+        return {}
+    }
+    const product = (await rawProduct.json()).data
+
+    return product
+}
+
+export async function modifyQuantityCart(quantity, cartLineId, cartId) {
+    await fetch(`http://localhost:3000/api/modifyQuantityCart`,
+        {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: `{
+                "cartId": "${cartId}",
+                "cartLineId": "${cartLineId}",
+                "quantity": "${quantity}"
+            }`
+        })
+}
+
+export async function deleteLineCart(cartLineId, cartId) {
+    await fetch(`http://localhost:3000/api/deleteLineCart`,
+        {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: `{
+                "cartId": "${cartId}",
+                "cartLineId": "${cartLineId}"
+            }`
+        })
+}
+
+
+
+export default function Cart({ products }) {
     const [id, setId] = useState(null)
-    const cartData = []
+    const [cartData, setCartData] = useState([])
+    const [cartMetaData, setCartMetaData] = useState({})
 
     useEffect(() => {
-        setId(localStorage.getItem("cartId"))
+        setId(sessionStorage.getItem('cartId'))
     }, [])
 
-    if (id === null) {
+    useEffect(() => {
+        if (window && id) {
+            fetch(`http://localhost:3000/api/cart?cartId=${id}`)
+                .then((res) => res.json())
+                .then(async (data) => {
+                    console.log(data)
+                    const lines = data.data.lines.edges
+                    // console.log(lines)
+                    const newLines = []
+                    for (let i = 0; i < lines.length; i++) {
+                        const newObj = {
+                            quantity: lines[i].node.quantity,
+                            ...await productFromVariant(lines[i].node.merchandise.id),
+                            ...lines[i]
+                        }
+                        newLines.push(newObj)
+                    }
+                    setCartData(newLines)
+                    setCartMetaData(data.data)
+                })
+        }
+
+    }, [id])
+
+    if (id === null || cartData.length == 0 || cartMetaData === {}) {
         return (
             <Box>
                 <Text>Cart Empty</Text>
             </Box>
         )
     }
+
+    console.log(cartData)
 
     return (
         <Box
@@ -40,7 +107,7 @@ export default function Cart() {
             px={{ base: '4', md: '8', lg: '12' }}
             py={{ base: '6', md: '8', lg: '12' }}
         >
-            <Button onClick={() => createCart()}>Test Create Cart</Button>
+            <Text>Cart id : {id}</Text>
             <Stack
                 direction={{ base: 'column', lg: 'row' }}
                 align={{ lg: 'flex-start' }}
@@ -48,21 +115,23 @@ export default function Cart() {
             >
                 <Stack spacing={{ base: '8', md: '10' }} flex="2">
                     <Heading fontSize="2xl" fontWeight="extrabold">
-                        Shopping Cart (3 items)
+                        Shopping Cart ({cartData.length} items)
                     </Heading>
 
                     <Stack spacing="6">
                         {cartData.map((item) => (
-                            <CartItem key={item.id} {...item} />
+                            <CartItem key={item.id} {...item} cartId={cartMetaData.id}
+                                      onClickDelete={deleteLineCart}
+                                      onChangeQuantity={modifyQuantityCart}/>
                         ))}
                     </Stack>
                 </Stack>
 
                 <Flex direction="column" align="center" flex="1">
-                    <CartOrderSummary />
+                    <CartOrderSummary {...cartMetaData}/>
                     <HStack mt="6" fontWeight="semibold">
                         <p>or</p>
-                        {/*<Link color={mode('blue.500', 'blue.200')}>Continue shopping</Link>*/}
+                        <Link href={'/'}>Continue shopping</Link>
                     </HStack>
                 </Flex>
             </Stack>

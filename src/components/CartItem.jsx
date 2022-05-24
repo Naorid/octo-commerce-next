@@ -1,7 +1,8 @@
-import { CloseButton, Flex, Link, Select, useColorModeValue } from '@chakra-ui/react'
+import {CloseButton, Flex, Link, Select, Text, useColorModeValue} from '@chakra-ui/react'
 import * as React from 'react'
 import { PriceTag } from './PriceTag'
 import { CartProductMeta } from './CartProductMeta'
+import {useState} from "react";
 
 const QuantitySelect = (props) => {
     return (
@@ -11,6 +12,7 @@ const QuantitySelect = (props) => {
             focusBorderColor={useColorModeValue('blue.500', 'blue.200')}
             {...props}
         >
+            <option value="0">0</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -20,17 +22,21 @@ const QuantitySelect = (props) => {
 }
 
 export const CartItem = (props) => {
+    const [quantity, setQuantity] = useState(props.quantity)
+
     const {
         isGiftWrapping,
         name,
         description,
-        quantity,
-        imageUrl,
+        image,
         currency,
         price,
         onChangeQuantity,
         onClickDelete,
+        node,
+        cartId
     } = props
+
     return (
         <Flex
             direction={{
@@ -43,7 +49,7 @@ export const CartItem = (props) => {
             <CartProductMeta
                 name={name}
                 description={description}
-                image={imageUrl}
+                image={image}
                 isGiftWrapping={isGiftWrapping}
             />
 
@@ -56,14 +62,16 @@ export const CartItem = (props) => {
                     md: 'flex',
                 }}
             >
+                <Text>Quantity={quantity}</Text>
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {
-                        onChangeQuantity?.(+e.currentTarget.value)
+                        onChangeQuantity?.(+e.currentTarget.value, node.id, cartId)
+                        setQuantity(e.currentTarget.value)
                     }}
                 />
                 <PriceTag price={price} currency={currency} />
-                <CloseButton aria-label={`Delete ${name} from cart`} onClick={onClickDelete} />
+                <CloseButton aria-label={`Delete ${name} from cart`} onClick={() => onClickDelete(node.id, cartId)} />
             </Flex>
 
             {/* Mobile */}

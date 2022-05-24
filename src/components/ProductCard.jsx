@@ -16,16 +16,25 @@ import { Rating } from './Rating'
 import { FavouriteButton } from './FavouriteButton'
 import { PriceTag } from './PriceTag'
 
-async function addProductToCart(productId) {
+async function addProductToCartButton(productId) {
+    // console.log(productId)
+    // console.log(sessionStorage.getItem('cartId'))
     // call addProductToCart
-    fetch("http://localhost:3000/api/addProductToCart.js",
+    const rawCartId = await fetch("http://localhost:3000/api/addProductToCart",
         {
             method: 'POST',
-            body: {
-                productId: productId,
-                cartId: localStorage.getItem('cartId')
-            }
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: `{
+                "productId": ${productId},
+                "cartId": "${sessionStorage.getItem('cartId')}"
+            }`
         })
+
+    const cartId = (await rawCartId.json()).data
+    // console.log(cartId)
+    sessionStorage.setItem('cartId', cartId.toString().split('gid://shopify/Cart/')[1])
 }
 
 export const ProductCard = (props) => {
@@ -77,7 +86,7 @@ export const ProductCard = (props) => {
                 </Stack>
             </Link>
             <Stack align="center">
-                <Button colorScheme="blue" isFullWidth>
+                <Button colorScheme="blue" isFullWidth onClick={() => addProductToCartButton(product.id)}>
                     Ajouter au panier
                 </Button>
                 <Link
