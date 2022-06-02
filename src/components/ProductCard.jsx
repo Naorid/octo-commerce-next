@@ -75,14 +75,14 @@ export const ProductCard = (props) => {
                         <Text fontWeight="medium" color={useColorModeValue('gray.700', 'gray.400')}>
                             {name}
                         </Text>
-                        <PriceTag compare_at_price={compare_at_price} price={price} currency="USD" />
+                        <PriceTag salePrice={price} price={compare_at_price} currency="EUR" />
                     </Stack>
-                    <HStack>
-                        <Rating defaultValue={rating} size="sm" />
-                        <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
-                            12 Commentaires
-                        </Text>
-                    </HStack>
+                    {/*<HStack>*/}
+                    {/*    <Rating defaultValue={rating} size="sm" />*/}
+                    {/*    <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>*/}
+                    {/*        12 Commentaires*/}
+                    {/*    </Text>*/}
+                    {/*</HStack>*/}
                 </Stack>
             </Link>
             <Stack align="center">

@@ -27,7 +27,7 @@ export async function getStaticProps(context) {
 
 export default function Page({ products }) {
     return (
-        <Container>
+        <Box>
              <VStack spacing={5}>
                 <Header></Header>
                 <Link href='/cart'>
@@ -57,6 +57,6 @@ export default function Page({ products }) {
                  <Footer></Footer>
 
              </VStack>
-         </Container>
+        </Box>
     )
 }

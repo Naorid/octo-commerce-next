@@ -26,7 +26,7 @@ async function productFromVariant(variantId) {
     return product
 }
 
-export async function modifyQuantityCart(quantity, cartLineId, cartId) {
+export async function modifyQuantityCart(quantity, cartLineId, cartId, setReload) {
     await fetch(`http://localhost:3000/api/modifyQuantityCart`,
         {
             method: 'POST',
@@ -39,9 +39,10 @@ export async function modifyQuantityCart(quantity, cartLineId, cartId) {
                 "quantity": "${quantity}"
             }`
         })
+    setReload(true)
 }
 
-export async function deleteLineCart(cartLineId, cartId) {
+export async function deleteLineCart(cartLineId, cartId, setReload) {
     await fetch(`http://localhost:3000/api/deleteLineCart`,
         {
             method: 'POST',
@@ -53,6 +54,7 @@ export async function deleteLineCart(cartLineId, cartId) {
                 "cartLineId": "${cartLineId}"
             }`
         })
+    setReload(true)
 }
 
 
@@ -61,6 +63,7 @@ export default function Cart({ products }) {
     const [id, setId] = useState(null)
     const [cartData, setCartData] = useState([])
     const [cartMetaData, setCartMetaData] = useState({})
+    const [reload, setReload] = useState(true)
 
     useEffect(() => {
         setId(sessionStorage.getItem('cartId'))
@@ -87,8 +90,9 @@ export default function Cart({ products }) {
                     setCartMetaData(data.data)
                 })
         }
+        setReload(false)
 
-    }, [id])
+    }, [id, reload])
 
     if (id === null || cartData.length == 0 || cartMetaData === {}) {
         return (
@@ -120,7 +124,7 @@ export default function Cart({ products }) {
 
                     <Stack spacing="6">
                         {cartData.map((item) => (
-                            <CartItem key={item.id} {...item} cartId={cartMetaData.id}
+                            <CartItem key={item.id} setReload={setReload} {...item} cartId={cartMetaData.id}
                                       onClickDelete={deleteLineCart}
                                       onChangeQuantity={modifyQuantityCart}/>
                         ))}
