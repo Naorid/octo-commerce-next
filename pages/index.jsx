@@ -18,6 +18,7 @@ export async function getStaticProps(context) {
     if (!rawProducts.ok) {
         return {props: {}}
     }
+
     const products = (await rawProducts.json()).data
 
     return {
