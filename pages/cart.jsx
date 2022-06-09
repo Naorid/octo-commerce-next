@@ -2,6 +2,7 @@ import {Box, Button, Flex, Heading, HStack, Link, Stack, Text} from "@chakra-ui/
 import {useEffect, useState} from "react";
 import {CartItem} from "../src/components/CartItem";
 import {CartOrderSummary} from "../src/components/CartOrderSummary";
+import Header from "../src/components/Header";
 
 export async function getStaticProps(context) {
     const rawProducts = await fetch(`http://localhost:3000/api/products`)
@@ -97,6 +98,7 @@ export default function Cart({ products }) {
     if (id === null || cartData.length == 0 || cartMetaData === {}) {
         return (
             <Box>
+                <Header></Header>
                 <Text>Cart Empty</Text>
             </Box>
         )
@@ -111,6 +113,7 @@ export default function Cart({ products }) {
             px={{ base: '4', md: '8', lg: '12' }}
             py={{ base: '6', md: '8', lg: '12' }}
         >
+            <Header></Header>
             <Text>Cart id : {id}</Text>
             <Stack
                 direction={{ base: 'column', lg: 'row' }}
@@ -132,7 +135,7 @@ export default function Cart({ products }) {
                 </Stack>
 
                 <Flex direction="column" align="center" flex="1">
-                    <CartOrderSummary {...cartMetaData}/>
+                    <CartOrderSummary {...cartMetaData} {...cartData}/>
                     <HStack mt="6" fontWeight="semibold">
                         <p>or</p>
                         <Link href={'/'}>Continue shopping</Link>

@@ -4,7 +4,7 @@ function Header() {
     return (
         <Container>
             <Box></Box>
-            <Heading>Accueil</Heading>
+            <Heading>OctoBook</Heading>
 
             <Text>{"<Inserer Description>"}</Text>
         </Container>
