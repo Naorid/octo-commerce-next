@@ -38,6 +38,8 @@ export const CartItem = (props) => {
         setReload
     } = props
 
+    const reload = props.reload
+
     return (
         <Flex
             direction={{
@@ -63,7 +65,7 @@ export const CartItem = (props) => {
                     md: 'flex',
                 }}
             >
-                <Text>Quantity={quantity}</Text>
+                <Text>Quantity={!reload ? quantity : "Loading..."}</Text>
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {
@@ -92,7 +94,8 @@ export const CartItem = (props) => {
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {
-                        onChangeQuantity?.(+e.currentTarget.value)
+                        onChangeQuantity?.(+e.currentTarget.value, node.id, cartId, setReload)
+                        setQuantity(e.currentTarget.value)
                     }}
                 />
                 <PriceTag price={price} currency={currency} />

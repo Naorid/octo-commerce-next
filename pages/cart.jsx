@@ -27,7 +27,8 @@ async function productFromVariant(variantId) {
     return product
 }
 
-export async function modifyQuantityCart(quantity, cartLineId, cartId, setReload) {
+export async function onChangeQuantity(quantity, cartLineId, cartId, setReload) {
+    setReload(true)
     await fetch(`http://localhost:3000/api/modifyQuantityCart`,
         {
             method: 'POST',
@@ -40,10 +41,9 @@ export async function modifyQuantityCart(quantity, cartLineId, cartId, setReload
                 "quantity": "${quantity}"
             }`
         })
-    setReload(true)
 }
 
-export async function deleteLineCart(cartLineId, cartId, setReload) {
+export async function onClickDelete(cartLineId, cartId, setReload) {
     await fetch(`http://localhost:3000/api/deleteLineCart`,
         {
             method: 'POST',
@@ -89,13 +89,22 @@ export default function Cart({ products }) {
                     }
                     setCartData(newLines)
                     setCartMetaData(data.data)
+                    setReload(false)
                 })
+        } else {
+            setReload(false)
         }
-        setReload(false)
 
     }, [id, reload])
 
-    if (id === null || cartData.length == 0 || cartMetaData === {}) {
+    if (Object.keys(cartMetaData).length == 0) {
+        return (
+            <Box>
+                <Header></Header>
+                <Text>Loading...</Text>
+            </Box>
+        )
+    } else if (cartData.length == 0) {
         return (
             <Box>
                 <Header></Header>
@@ -127,15 +136,15 @@ export default function Cart({ products }) {
 
                     <Stack spacing="6">
                         {cartData.map((item) => (
-                            <CartItem key={item.id} setReload={setReload} {...item} cartId={cartMetaData.id}
-                                      onClickDelete={deleteLineCart}
-                                      onChangeQuantity={modifyQuantityCart}/>
+                            <CartItem key={item.id} setReload={setReload} reload={reload} {...item} cartId={cartMetaData.id}
+                                      onClickDelete={onClickDelete}
+                                      onChangeQuantity={onChangeQuantity}/>
                         ))}
                     </Stack>
                 </Stack>
 
                 <Flex direction="column" align="center" flex="1">
-                    <CartOrderSummary {...cartMetaData} {...cartData}/>
+                    <CartOrderSummary {...cartMetaData} {...cartData} reload={reload}/>
                     <HStack mt="6" fontWeight="semibold">
                         <p>or</p>
                         <Link href={'/'}>Continue shopping</Link>

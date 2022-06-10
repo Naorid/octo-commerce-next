@@ -7,6 +7,7 @@ import {
     Text,
     useColorModeValue as mode,
 } from '@chakra-ui/react'
+import Router from 'next/router'
 import * as React from 'react'
 import { FaArrowRight } from 'react-icons/fa'
 import { formatPrice } from './PriceTag'
@@ -32,6 +33,8 @@ export async function createCheckout(cartLines) {
             },
             body: JSON.stringify(cartLines)
         })
+    const data = await rawData.json()
+    await Router.push(data.data.checkoutCreate.checkout.webUrl)
 }
 
 /*
@@ -48,7 +51,8 @@ export async function createCheckout(cartLines) {
 
 export const CartOrderSummary = (props) => {
     const {
-        estimated_cost
+        estimated_cost,
+        reload
     } = props
     const subtotal = estimated_cost.subtotalAmount.amount
     const total = estimated_cost.totalAmount.amount
@@ -68,7 +72,7 @@ export const CartOrderSummary = (props) => {
             <Heading size="md">Order Summary</Heading>
 
             <Stack spacing="6">
-                <OrderSummaryItem label="Subtotal" value={formatPrice(subtotal)} />
+                <OrderSummaryItem label="Subtotal" value={!reload ? formatPrice(subtotal) : "Loading..."} />
                 <OrderSummaryItem label="Shipping + Tax">
                     <Link href="#" textDecor="underline">
                         Calculate shipping
@@ -84,7 +88,7 @@ export const CartOrderSummary = (props) => {
                         Total
                     </Text>
                     <Text fontSize="xl" fontWeight="extrabold">
-                        {formatPrice(total)}
+                        {!reload ? formatPrice(total) : "Loading..."}
                     </Text>
                 </Flex>
             </Stack>
