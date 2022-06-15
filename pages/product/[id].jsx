@@ -7,6 +7,7 @@ import Footer from "../../src/components/Footer";
 
 export async function getServerSideProps(context) {
     const rawProduct = await fetch(`http://localhost:3000/api/product/${context.query.id}`)
+    console.log(rawProduct)
     if (!rawProduct.ok) {
         return {props: {}}
     }

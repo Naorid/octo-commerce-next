@@ -63,7 +63,7 @@ async function commerceToolsProducts(req, res) {
         if (!rawResults.length) {
             return res
                 .status(404)
-                .json({ error: 'No order was found !' });
+                .json({ error: 'No products was found !' });
         }
         console.log("rawResults=", rawResults)
         const products = Array.from(rawResults).map(rawResult => {
