@@ -13,7 +13,7 @@ import Footer from "../src/components/Footer"
 import {ProductGrid} from "../src/components/ProductGrid";
 import {ProductCard} from "../src/components/ProductCard";
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {
     const rawProducts = await fetch(`http://localhost:3000/api/products`)
     if (!rawProducts.ok) {
         return {props: {}}

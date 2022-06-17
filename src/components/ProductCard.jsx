@@ -17,7 +17,7 @@ import { FavouriteButton } from './FavouriteButton'
 import { PriceTag } from './PriceTag'
 
 async function addProductToCartButton(productId) {
-    // console.log(productId)
+    console.log("productId", productId)
     // console.log(sessionStorage.getItem('cartId'))
     // call addProductToCart
     const rawCartId = await fetch("http://localhost:3000/api/addProductToCart",
@@ -27,7 +27,7 @@ async function addProductToCartButton(productId) {
                 'content-type': 'application/json'
             },
             body: `{
-                "productId": ${productId},
+                "productId": "${productId}",
                 "cartId": "${sessionStorage.getItem('cartId')}"
             }`
         })

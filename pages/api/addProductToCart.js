@@ -1,8 +1,53 @@
 import {shopifyGraphQL} from "../../src/utils/apicall";
 import {shopifyCartFormat} from "../../src/utils/dataFormats";
+import {config} from "dotenv";
+import {apiRoot, projectKey} from "../../src/utils/commerceToolsConfig";
 
+config()
 
-async function createCart(productVariantId) {
+const commerceToolsMode = `${process.env.PROVIDER}` === 'COMMERCE_TOOLS'
+const commerceToolsVariantQuery = (productId) => `
+    query {
+  product(id: "${productId}") {
+    id
+      masterData {
+        current {
+          name(locale:"FR")
+          masterVariant {
+             id
+          }
+        }
+      }
+  }
+}
+
+`
+const commerceToolsCreateCartQuery = (productId, variantId) => `
+{
+  "currency" : "EUR",
+  "country": "FR",
+  "customerGroup": {
+      "id": "bce97418-5d75-46f4-ba35-e6065217b041"
+  },
+  "lineItems": [
+      {
+          
+          "productId": "${productId}",
+          "variant": {
+              "id": "${variantId}"
+          },
+          "quantity": 1,
+          "supplyChannel": {
+              "id": "e5c09527-68cf-4b03-be51-7410d491a666"
+          },
+          "distributionChannel": {
+              "id": "e5c09527-68cf-4b03-be51-7410d491a666"
+          }
+      }
+  ]
+}`
+
+async function shopifyCreateCart(productVariantId) {
     const rawCart = await shopifyGraphQL(
         `mutation {
   cartCreate(
@@ -60,8 +105,39 @@ async function createCart(productVariantId) {
     )
     const shopifyCart = (await rawCart.json()).data.cartCreate.cart
     console.log(shopifyCart)
-    const cart = shopifyCartFormat(shopifyCart)
-    return cart
+    return shopifyCartFormat(shopifyCart)
+}
+
+async function commerceToolsCreateCart(productId, productVariantId) {
+    return await apiRoot
+        .withProjectKey({ projectKey })
+        .carts()
+        .post({
+            body: commerceToolsCreateCartQuery(productId, productVariantId)
+        })
+        .execute()
+        .then(result => {
+            const rawResult = result.body
+            console.log("cart rawResult=", rawResult)
+            const cart = {
+                id: rawResult.id,
+                line: rawResult.lineItems,
+                estimated_cost: rawResult.totalPrice.centAmount,
+            }
+            console.log("cart=", cart)
+            return cart
+        })
+        .catch((e) => {
+            console.error(e)
+        })
+}
+
+async function createCart(productVariantId) {
+    if (!commerceToolsMode) {
+        return shopifyCreateCart(productVariantId)
+    } else {
+        return commerceToolsCreateCart(productVariantId)
+    }
 }
 
 
@@ -69,20 +145,6 @@ async function createCart(productVariantId) {
 // Add products to cart
 
 async function addProductToCart(cartId, productVariantId) {
-    // Create Line
-    const line = {
-        edges: [
-            {
-                node: {
-                    merchandise: {
-                        id: productVariantId
-                    },
-                    quantity: 1
-                }
-            }
-        ]
-    }
-
     // Add line with product Id
     const rawResult = await shopifyGraphQL( `mutation {
             cartLinesAdd(
@@ -116,24 +178,7 @@ async function addProductToCart(cartId, productVariantId) {
     return result.data !== undefined && result.data.cartLinesAdd !== undefined
 }
 
-/*
-Body :
-{
-    productId: "",
-    cartId
-}
- */
-
-export default async function handler(req, res) {
-    const productId = req.body.productId //(await JSON.parse(req.body)).productId
-    let cartId = req.body.cartId //(await JSON.parse(req.body)).cartId
-
-    if (req.method !== 'POST' || productId === undefined) {
-        res.end()
-        return {props: {}}
-
-    }
-    // Get product variants from req
+async function shopifyGetProductVariant(productId) {
     const rawProductVariants = await shopifyGraphQL(
         `
         {
@@ -151,8 +196,57 @@ export default async function handler(req, res) {
             }
         }`
     )
-    const productVariantId = (await rawProductVariants.json()).data.node.variants.edges[0].node.id
+    return (await rawProductVariants.json()).data.node.variants.edges[0].node.id
+}
 
+async function commerceToolsGetProductVariant(productId) {
+    console.log("Yo")
+    console.log(productId)
+    return await apiRoot
+        .withProjectKey({ projectKey })
+        .graphql()
+        .post({
+            body: { query: commerceToolsVariantQuery(productId) }
+        })
+        .execute()
+        .then(result => {
+            const rawResult = result.body.data.product;
+            console.log("rawResult=", rawResult.id)
+            return rawResult.id
+        })
+        .catch(e => {
+            // console.error(e);
+            console.error(e)
+        })
+}
+
+async function getProductVariant(productId) {
+    if (!commerceToolsMode) return await shopifyGetProductVariant(productId)
+    return await commerceToolsGetProductVariant(productId)
+}
+
+/*
+Body :
+{
+    productId: "",
+    cartId
+}
+ */
+
+export default async function handler(req, res) {
+    console.log("Bonjour")
+    const productId = req.body.productId //(await JSON.parse(req.body)).productId
+
+    let cartId = req.body.cartId //(await JSON.parse(req.body)).cartId
+    if (req.method !== 'POST' || productId === undefined) {
+        res.end()
+
+        return {props: {}}
+    }
+    console.log("Bonjour")
+    // Get product variants from req
+    const productVariantId = await getProductVariant(productId)
+    console.log("productVariantId", productVariantId)
     // const cartId = .getItem('cartId')
     // const cartId = "gid://shopify/Cart/2b1630b1c5127af8e447b6ba2d773106"
     // const cartId = undefined
@@ -169,7 +263,9 @@ export default async function handler(req, res) {
         if (await addProductToCart(cartId, productVariantId)) {
             console.log("Line Added !")
         }
-        cartId = `gid://shopify/Cart/${cartId}`
+        if (!commerceToolsMode) {
+            cartId = `gid://shopify/Cart/${cartId}`
+        }
     }
 
     res.json({data: cartId})
