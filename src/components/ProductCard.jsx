@@ -72,7 +72,7 @@ export const ProductCard = (props) => {
 
                 <Stack>
                     <Stack spacing="1">
-                        <Text fontWeight="medium" color={useColorModeValue('gray.700', 'gray.400')}>
+                        <Text fontWeight="medium" color={useColorModeValue('white', 'white')}>
                             {name}
                         </Text>
                         <PriceTag salePrice={price} price={compare_at_price} currency="EUR" />
@@ -86,13 +86,13 @@ export const ProductCard = (props) => {
                 </Stack>
             </Link>
             <Stack align="center">
-                <Button colorScheme="blue" isFullWidth onClick={() => addProductToCartButton(product.id)}>
+                <Button colorScheme="linkedin" bgColor={"#00b0cb"} isFullWidth onClick={() => addProductToCartButton(product.id)}>
                     Ajouter au panier
                 </Button>
                 <Link
                     textDecoration="underline"
                     fontWeight="medium"
-                    color={useColorModeValue('gray.600', 'gray.400')}
+                    color={useColorModeValue('white', 'white')}
                 >
                     Achat rapide
                 </Link>

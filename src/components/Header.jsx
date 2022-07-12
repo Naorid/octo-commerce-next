@@ -1,12 +1,10 @@
-import {Box, Container, Heading, Text} from "@chakra-ui/react";
+import {Box, Container, Heading, Text, Image} from "@chakra-ui/react";
 
 function Header() {
     return (
         <Container>
             <Box></Box>
-            <Heading>OctoBook</Heading>
-
-            <Text>{"<Inserer Description>"}</Text>
+            <img src="/assets/octobook.png" alt="" id="octobook"></img>
         </Container>
     )
 }
