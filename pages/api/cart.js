@@ -76,6 +76,7 @@ async function shopifyCart(req, res) {
     console.log('lines=', shopifyCart.lines.edges)
 
     const cart = shopifyCartFormat(shopifyCart)
+    console.log("cartObject=", cart.lines.edges)
     res.json({data: cart})
     return res
 }
@@ -84,35 +85,39 @@ async function commerceToolsCart(req, res) {
     await apiRoot
         .withProjectKey({ projectKey })
         .carts()
-        .get({
-            queryArgs: {
-                id: req.query.cartId
-            }
-        })
+        .withId({ID: req.query.cartId})
+        .get()
         .execute()
         .then(result => {
             console.log("cart", result)
-            // const rawResults = result.body.data.products.results;
-            // if (!rawResults.length) {
-            //     return res
-            //         .status(404)
-            //         .json({ error: 'No products was found !' });
-            // }
-            // console.log("rawResults=", rawResults)
-            // const products = Array.from(rawResults).map(rawResult => {
-            //     return {
-            //         id: rawResult.id,
-            //         name: rawResult.masterData.current.name,
-            //         image: rawResult.masterData.current.masterVariant.images[0].url,
-            //         price: rawResult.masterData.current.masterVariant.prices[0].value.centAmount.toString(),
-            //         compare_at_price: null,
-            //         description: rawResult.masterData.current.description
-            //     }
-            // })
-            // console.log("products=", products)
-            // return res.status(200).json({
-            //     data: products
-            // });
+            const rawResult = result.body;
+            console.log(rawResult)
+            const cart = {
+                id: rawResult.id,
+                lines: {
+                    edges: rawResult.lineItems.map(line => {
+                        return {
+                            node: {
+                                line,
+                                merchandise: line.id,
+                                quantity: line.quantity
+                            }
+                        }
+                    })
+                },
+                estimated_cost: {
+                    totalAmount: {
+                        amount: rawResult.totalPrice.centAmount
+                    },
+                    subtotalAmount: {
+                        amount: rawResult.totalPrice.centAmount
+                    }
+                },
+            }
+            console.log("cart Object=", cart.lines.edges)
+            return res.status(200).json({
+                data: cart
+            });
         })
         .catch(e => {
             // console.error(e);

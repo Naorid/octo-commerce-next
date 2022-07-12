@@ -46,6 +46,22 @@ const commerceToolsCreateCartQuery = (productId, variantId) => `
       }
   ]
 }`
+const commerceToolsAddProductQuery = (productId) => `
+{
+  "version" : 1,
+  "actions" : [ {
+    "action" : "addLineItem",
+    "productId" : "${productId}",
+    "variantId" : 1,
+    "quantity" : 1,
+    "supplyChannel": {
+      "id": "e5c09527-68cf-4b03-be51-7410d491a666"
+  },
+  "distributionChannel": {
+      "id": "e5c09527-68cf-4b03-be51-7410d491a666"
+  }
+  } ]
+}`
 
 async function shopifyCreateCart(productVariantId) {
     const rawCart = await shopifyGraphQL(
@@ -144,8 +160,7 @@ async function createCart(productVariantId) {
 
 // Add products to cart
 
-async function addProductToCart(cartId, productVariantId) {
-    // Add line with product Id
+async function shopifyAddProductToCart(cartId, productVariantId) {
     const rawResult = await shopifyGraphQL( `mutation {
             cartLinesAdd(
                 cartId: "gid://shopify/Cart/${cartId}",
@@ -176,6 +191,37 @@ async function addProductToCart(cartId, productVariantId) {
     const result = await rawResult.json()
     console.log('addProductToCartResult=', result)
     return result.data !== undefined && result.data.cartLinesAdd !== undefined
+}
+
+async function commerceToolsAddProductToCart(cartId, productId, productVariantId) {
+    return await apiRoot
+        .withProjectKey({ projectKey })
+        .carts()
+        .withId({ID: cartId.toString() })
+        .post({
+            body: commerceToolsAddProductQuery(productId)
+        })
+        .execute()
+        .then(result => {
+            const rawResult = result.body
+            console.log("cart rawResult=", rawResult)
+            const cart = {
+                id: rawResult.id,
+                line: rawResult.lineItems,
+                estimated_cost: rawResult.totalPrice.centAmount,
+            }
+            console.log("cart=", cart)
+            return cart
+        })
+        .catch((e) => {
+            console.error("error", e, e.body.errors, "errorEnd")
+        })
+}
+
+async function addProductToCart(cartId, productId, productVariantId) {
+    // Add line with product Id
+    if (!commerceToolsMode) return await shopifyAddProductToCart(cartId, productVariantId)
+    return await commerceToolsAddProductToCart(cartId, productId, productVariantId)
 }
 
 async function shopifyGetProductVariant(productId) {
@@ -253,14 +299,14 @@ export default async function handler(req, res) {
 
     // Does it have a cart id ?
 
-    if (cartId === undefined || cartId === 'null') {
+    if (cartId === undefined || cartId === "undefined" || cartId === 'null') {
         console.log("No cart : Creating one...")
-        cartId = (await createCart(productVariantId)).id
+        cartId = (await createCart(productVariantId)).id.toString()
     }
     else {
         console.log("Cart id : ", cartId)
         // function to add to cart
-        if (await addProductToCart(cartId, productVariantId)) {
+        if (await addProductToCart(cartId, productId, productVariantId)) {
             console.log("Line Added !")
         }
         if (!commerceToolsMode) {

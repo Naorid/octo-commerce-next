@@ -96,7 +96,8 @@ export const CartOrderSummary = (props) => {
                     size="lg"
                     fontSize="md"
                     rightIcon={<FaArrowRight />}
-                    onClick={() => createCheckout(cartLines)}>
+                    // onClick={() => createCheckout(cartLines)}
+            >
                 {/*<Link href="/checkout">*/}
                 {/*    Checkout*/}
                 {/*</Link>*/}
