@@ -33,8 +33,8 @@ async function addProductToCartButton(productId) {
         })
 
     const cartId = (await rawCartId.json()).data
-    // console.log(cartId)
-    sessionStorage.setItem('cartId', cartId.toString().split('gid://shopify/Cart/')[1])
+    console.log(cartId)
+    sessionStorage.setItem('cartId', cartId[0] === 'g' ? cartId.toString().split('gid://shopify/Cart/')[1] : cartId)
 }
 
 export const ProductCard = (props) => {

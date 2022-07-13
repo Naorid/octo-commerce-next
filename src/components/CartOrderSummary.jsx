@@ -25,16 +25,17 @@ const OrderSummaryItem = (props) => {
 }
 
 export async function createCheckout(cartLines) {
-    const rawData = await fetch(`http://localhost:3000/api/createCheckout`,
-        {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(cartLines)
-        })
-    const data = await rawData.json()
-    await Router.push(data.data.checkoutCreate.checkout.webUrl)
+    // const rawData = await fetch(`http://localhost:3000/api/createCheckout`,
+    //     {
+    //         method: 'POST',
+    //         headers: {
+    //             'content-type': 'application/json'
+    //         },
+    //         body: JSON.stringify(cartLines)
+    //     })
+    // const data = await rawData.json()
+    // await Router.push(data.data.checkoutCreate.checkout.webUrl)
+    await Router.push("/checkout")
 }
 
 /*
@@ -96,7 +97,10 @@ export const CartOrderSummary = (props) => {
                     size="lg"
                     fontSize="md"
                     rightIcon={<FaArrowRight />}
-                    onClick={() => createCheckout(cartLines)}>
+                    onClick={() => createCheckout(cartLines)}
+            >
+                {/*<Link href={"/checkout"}></Link>*/}
+
                 {/*<Link href="/checkout">*/}
                 {/*    Checkout*/}
                 {/*</Link>*/}

@@ -1,10 +1,15 @@
-import {Box, Container, Heading, Text, Image} from "@chakra-ui/react";
+import {Box, Button, Container, Heading, Text, Image} from "@chakra-ui/react";
+
+export function removeCart() {
+    sessionStorage.removeItem('cartId')
+}
 
 function Header() {
     return (
         <Container>
             <Box></Box>
             <img src="/assets/octobook.png" alt="" id="octobook"></img>
+            <Button onClick={() => removeCart()}>Remove Cart</Button>
         </Container>
     )
 }

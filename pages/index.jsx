@@ -58,6 +58,7 @@ export default function Page({ products }) {
                  <Footer></Footer>
 
              </VStack>
+            {/*<Image src={"assets/img.png"}></Image>*/}
         </Box>
     )
 }
