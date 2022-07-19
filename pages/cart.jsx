@@ -23,11 +23,13 @@ async function productFromVariant(variantId) {
         return {}
     }
     const product = (await rawProduct.json()).data
+    console.log("Product=", product)
 
     return product
 }
 
 export async function onChangeQuantity(quantity, cartLineId, cartId, setReload) {
+    console.log("cartLineId=", cartLineId)
     setReload(true)
     await fetch(`http://localhost:3000/api/modifyQuantityCart`,
         {
@@ -65,9 +67,15 @@ export default function Cart({ products }) {
     const [cartData, setCartData] = useState([])
     const [cartMetaData, setCartMetaData] = useState({})
     const [reload, setReload] = useState(true)
+    const [updated, setUpdated] = useState(false)
 
     useEffect(() => {
-        setId(sessionStorage.getItem('cartId'))
+        const storedId = sessionStorage.getItem('cartId')
+        console.log(storedId)
+        setId(storedId)
+        if (storedId === null) {
+            setUpdated(true)
+        }
     }, [])
 
     useEffect(() => {
@@ -75,36 +83,54 @@ export default function Cart({ products }) {
             fetch(`http://localhost:3000/api/cart?cartId=${id}`)
                 .then((res) => res.json())
                 .then(async (data) => {
-                    console.log(data)
                     const lines = data.data.lines.edges
                     // console.log(lines)
                     const newLines = []
                     for (let i = 0; i < lines.length; i++) {
-                        const newObj = {
-                            quantity: lines[i].node.quantity,
-                            ...await productFromVariant(lines[i].node.merchandise.id),
-                            ...lines[i]
+                        let newObj = {}
+                        // CommerceTools product
+                        if (lines[i].node.line) {
+                            newObj = {
+                                image: lines[i].node.line.variant.images[0].url,
+                                ...await productFromVariant(lines[i].node.merchandise.id),
+                                ...lines[i],
+                                quantity: lines[i].node.quantity,
+                                name: lines[i].node.line.name.fr,
+                                price: lines[i].node.line.price.value.centAmount / 100,
+                                lineId: lines[i].node.line.id
+                            }
+                            // Shopify Product
+                        } else {
+                            newObj = {
+                                ...await productFromVariant(lines[i].node.merchandise.id),
+                                ...lines[i],
+                                quantity: lines[i].node.quantity,
+                            }
                         }
                         newLines.push(newObj)
                     }
                     setCartData(newLines)
+                    console.log("CartData=", newLines)
                     setCartMetaData(data.data)
+                    console.log("MetaData=", data.data)
                     setReload(false)
                 })
+                .then(() => setUpdated(true))
+                .catch((e) => console.log(e) && setUpdated(true))
         } else {
             setReload(false)
         }
 
     }, [id, reload])
 
-    if (Object.keys(cartMetaData).length == 0) {
+    if (!updated) {
         return (
             <Box>
                 <Header></Header>
                 <Text>Loading...</Text>
             </Box>
         )
-    } else if (cartData.length == 0) {
+    } else if (cartData.length === 0) {
         return (
             <Box>
                 <Header></Header>
@@ -123,7 +149,6 @@ export default function Cart({ products }) {
             py={{ base: '6', md: '8', lg: '12' }}
         >
             <Header></Header>
-            <Text>Cart id : {id}</Text>
             <Stack
                 direction={{ base: 'column', lg: 'row' }}
                 align={{ lg: 'flex-start' }}

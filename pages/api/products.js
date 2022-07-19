@@ -38,7 +38,7 @@ async function shopifyProducts(req, res) {
 
     if (!rawProducts.ok) {
         res.writeHead(302, {Location: '/products'})
-        res.end()
+
         return {props: {}}
     }
 
@@ -87,7 +87,7 @@ async function commerceToolsProducts(req, res) {
         // console.error(e);
         res.status(400).json(e);
     });
-    // res.end()
+    // `
     return res
 }
 

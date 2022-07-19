@@ -30,6 +30,24 @@ const commerceToolsShippingAddressQuery = (cartVersion, shippingAddress) =>
     }
 }
 
+const commerceToolsCustomTypeQuery = (orderVersion, polygram) => {
+    return {
+        version: orderVersion,
+        actions: [
+            {
+                action : "setCustomType",
+                type : {
+                    id : "3ee50659-33e7-4b41-ac63-007055fde5fb",
+                    typeId : "type"
+                },
+                fields : {
+                    polygramme : polygram
+                }
+            }
+        ]
+    }
+}
+
 const commerceToolsOrderQuery = (cartVersion, cartId) =>
 {
     const  now = new Date()
@@ -81,6 +99,7 @@ async function shopifyCheckout(req, res) {
 async function commerceToolsOrder(req, res) {
     const cartId = req.body.cartId
     const shippingAddress = req.body.shippingAddress
+    const polygram = req.body.polygram
 
     // Get cart version
 
@@ -143,11 +162,35 @@ async function commerceToolsOrder(req, res) {
     console.log("Bonjour2")
     console.log(cartId)
 
-    await apiRoot
+    const order = await apiRoot
         .withProjectKey({ projectKey })
         .orders()
         .post({
             body: commerceToolsOrderQuery(cartVersion, cartId)
+        })
+        .execute()
+        .then(result => {
+            console.log("order", result)
+            const rawResult = result.body;
+            console.log(rawResult)
+            return {
+                id: result.body.id,
+                version: result.body.version
+            }
+        })
+        .catch(e => {
+            console.error(e);
+            res.status(400).json(e);
+        })
+
+    // Set Octo order custom type
+
+    await apiRoot
+        .withProjectKey({ projectKey })
+        .orders()
+        .withId({ID: order.id})
+        .post({
+            body: commerceToolsCustomTypeQuery(order.version, polygram)
         })
         .execute()
         .then(result => {
@@ -159,6 +202,7 @@ async function commerceToolsOrder(req, res) {
             console.error(e);
             res.status(400).json(e);
         })
+
     return res
 }
 

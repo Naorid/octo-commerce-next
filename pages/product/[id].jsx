@@ -33,18 +33,15 @@ export default function Page({ product }) {
 
                     <VStack>
                         <Heading as='h5'>{product.name}</Heading>
-                        <Box>
-                            {product.price}
-                            <Box m={1} as='span' color='gray.600' fontSize='sm'>
-                                €
-                            </Box>
-                        </Box>
+                        <Text fontSize='4xl'>
+                            {product.price} €
+                        </Text>
                         <Text>{product.description}</Text>
                     </VStack>
                 </HStack>
 
                 <Link href="/">
-                    <Button>Home</Button>
+                    <Button colorScheme="linkedin">Home</Button>
                 </Link>
 
                 <Footer></Footer>

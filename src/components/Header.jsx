@@ -9,7 +9,7 @@ function Header() {
         <Container>
             <Box></Box>
             <img src="/assets/octobook.png" alt="" id="octobook"></img>
-            <Button onClick={() => removeCart()}>Remove Cart</Button>
+            <Button colorScheme="linkedin" onClick={() => removeCart()}>Remove Cart</Button>
         </Container>
     )
 }

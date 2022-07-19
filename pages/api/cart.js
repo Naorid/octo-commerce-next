@@ -100,17 +100,18 @@ async function commerceToolsCart(req, res) {
                             node: {
                                 line,
                                 merchandise: line.id,
-                                quantity: line.quantity
+                                quantity: line.quantity,
+                                image: line.variant.images[0].url
                             }
                         }
                     })
                 },
                 estimated_cost: {
                     totalAmount: {
-                        amount: rawResult.totalPrice.centAmount
+                        amount: rawResult.totalPrice.centAmount / 100
                     },
                     subtotalAmount: {
-                        amount: rawResult.totalPrice.centAmount
+                        amount: rawResult.totalPrice.centAmount / 100
                     }
                 },
             }

@@ -57,7 +57,7 @@ async function commerceToolsProduct(req, res) {
             id: rawResult.id,
             name: rawResult.masterData.current.name,
             image: rawResult.masterData.current.masterVariant.images[0].url,
-            price: rawResult.masterData.current.masterVariant.prices[0].value.centAmount.toString(),
+            price: rawResult.masterData.current.masterVariant.prices[0].value.centAmount / 100,
             compare_at_price: null,
             description: rawResult.masterData.current.description
         }

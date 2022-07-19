@@ -34,9 +34,11 @@ export const CartItem = (props) => {
         onChangeQuantity,
         onClickDelete,
         node,
+        lineId,
         cartId,
         setReload
     } = props
+    console.log("cartId=", cartId)
 
     const reload = props.reload
 
@@ -69,12 +71,12 @@ export const CartItem = (props) => {
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {
-                        onChangeQuantity?.(+e.currentTarget.value, node.id, cartId, setReload)
+                        onChangeQuantity?.(+e.currentTarget.value, lineId, cartId, setReload)
                         setQuantity(e.currentTarget.value)
                     }}
                 />
                 <PriceTag price={price} currency={currency} />
-                <CloseButton aria-label={`Delete ${name} from cart`} onClick={() => onClickDelete(node.id, cartId, setReload)} />
+                <CloseButton aria-label={`Delete ${name} from cart`} onClick={() => onClickDelete(node.id, lineId, setReload)} />
             </Flex>
 
             {/* Mobile */}
@@ -94,7 +96,7 @@ export const CartItem = (props) => {
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {
-                        onChangeQuantity?.(+e.currentTarget.value, node.id, cartId, setReload)
+                        onChangeQuantity?.(+e.currentTarget.value, node.id, lineId, setReload)
                         setQuantity(e.currentTarget.value)
                     }}
                 />

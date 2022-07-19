@@ -1,46 +1,67 @@
-import {Box, Button, Text} from "@chakra-ui/react";
+import {
+    Box, Button, Input, Link, Select,
+    Text,
+} from "@chakra-ui/react";
 import Header, {removeCart} from "../src/components/Header";
-import {useState} from "react";
-import {useEffect} from "react";
 import Router from "next/router";
 
-
-async function createOrder(id) {
-    const rawData = await fetch(`http://localhost:3000/api/createOrder`,
-        {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                cartId: id,
-                shippingAddress: {
-                    country: "FR"
-                }
-            })
-        })
-    console.log("Order=", rawData)
-    if (rawData.ok) {
-        console.log("OK!")
-    }
-    removeCart()
-    await Router.push("/")
-}
-
-
 export default function Page() {
-    const [id, setId] = useState(null)
+    const formSubmit = async (event) => {
+        event.preventDefault();
+        console.log(event.target)
 
-    useEffect(() => {
-        setId(sessionStorage.getItem('cartId'))
-    }, [])
+        console.log()
+
+        const rawData = await fetch(`http://localhost:3000/api/createOrder`,
+            {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cartId: (sessionStorage.getItem('cartId')).toString(),
+                    shippingAddress: {
+                        country: event.target.country.value === 'France' ? 'FR' : 'FR',
+                        firstName: event.target.first.value,
+                        lastName: event.target.last.value
+                    },
+                    polygram: event.target.polygram.value
+                })
+            })
+        console.log("Order=", rawData)
+        if (rawData.ok) {
+            console.log("OK!")
+            alert('Order Created')
+        }
+        removeCart()
+        await Router.push("/")
+    }
 
     return (
         <Box>
             <Header></Header>
             <Text>Checkout</Text>
-            <Text>Id={id}</Text>
-            <Button onClick={() => createOrder(id)}>CreateCheckout</Button>
+            <form onSubmit={formSubmit}>
+                <label htmlFor="first">First name:</label>
+                <Input type="text" id="first" name="first"/>
+                <label htmlFor="last">Last name:</label>
+                <Input type="text" id="last" name="last"/>
+                <label htmlFor="polygram">Polygram</label>
+                <Input type="text" id="polygram" name="polygram"/>
+                <label htmlFor="country">Country</label>
+                <Select name="country" id="country">
+                    <option style={{ color: 'black' }} value="">Select a country</option>
+                    <option style={{ color: 'black' }} value="France">France</option>
+                    <option style={{ color: 'black' }} value="Not France">Not France</option>
+                </Select>
+                <Button colorScheme="linkedin" type="submit">Order</Button>
+            </form>
+
+            <Link href="/">
+                <Button colorScheme="linkedin">Home</Button>
+            </Link>
+
+            {/*<Button onClick={() => createOrder(id)}>Create Order</Button>*/}
         </Box>
     )
 }

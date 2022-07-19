@@ -46,9 +46,9 @@ const commerceToolsCreateCartQuery = (productId, variantId) => `
       }
   ]
 }`
-const commerceToolsAddProductQuery = (productId) => `
+const commerceToolsAddProductQuery = (cartVersion, productId) => `
 {
-  "version" : 1,
+  "version" : ${cartVersion},
   "actions" : [ {
     "action" : "addLineItem",
     "productId" : "${productId}",
@@ -194,12 +194,30 @@ async function shopifyAddProductToCart(cartId, productVariantId) {
 }
 
 async function commerceToolsAddProductToCart(cartId, productId, productVariantId) {
+    // Get cart version
+
+    const cartVersion = await apiRoot
+        .withProjectKey({ projectKey })
+        .carts()
+        .withId({ID: cartId.toString()})
+        .get()
+        .execute()
+        .then(async result => {
+            console.log("cart", result)
+            // console.log(cart)
+            return result.body.version
+        })
+        .catch(e => {
+            console.error(e);
+            res.status(400).json(e);
+        })
+
     return await apiRoot
         .withProjectKey({ projectKey })
         .carts()
         .withId({ID: cartId.toString() })
         .post({
-            body: commerceToolsAddProductQuery(productId)
+            body: commerceToolsAddProductQuery(cartVersion, productId)
         })
         .execute()
         .then(result => {

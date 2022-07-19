@@ -15,6 +15,7 @@ import * as React from 'react'
 import { Rating } from './Rating'
 import { FavouriteButton } from './FavouriteButton'
 import { PriceTag } from './PriceTag'
+import Router from "next/router";
 
 async function addProductToCartButton(productId) {
     console.log("productId", productId)
@@ -37,9 +38,15 @@ async function addProductToCartButton(productId) {
     sessionStorage.setItem('cartId', cartId[0] === 'g' ? cartId.toString().split('gid://shopify/Cart/')[1] : cartId)
 }
 
+async function quickBuy(productId) {
+    await addProductToCartButton(productId)
+    await Router.push("/cart")
+}
+
 export const ProductCard = (props) => {
     const { product, rootProps } = props
-    const { name, image, compare_at_price, price, rating } = product
+    const { name, image, compare_at_price, price } = product
+
     return (
         <Stack
             spacing={useBreakpointValue({
@@ -62,12 +69,6 @@ export const ProductCard = (props) => {
                             })}
                         />
                     </AspectRatio>
-                    <FavouriteButton
-                        position="absolute"
-                        top="4"
-                        right="4"
-                        aria-label={`Add ${name} to your favourites`}
-                    />
                 </Box>
 
                 <Stack>
@@ -89,13 +90,21 @@ export const ProductCard = (props) => {
                 <Button colorScheme="linkedin" bgColor={"#00b0cb"} isFullWidth onClick={() => addProductToCartButton(product.id)}>
                     Ajouter au panier
                 </Button>
-                <Link
+                <Button
                     textDecoration="underline"
                     fontWeight="medium"
                     color={useColorModeValue('white', 'white')}
+                    style={{
+                        background: "none",
+                        border: "none",
+                        margin:0,
+                        padding:0,
+                        cursor: "pointer"
+                    }}
+                    onClick={() => quickBuy(product.id)}
                 >
                     Achat rapide
-                </Link>
+                </Button>
             </Stack>
         </Stack>
     )
