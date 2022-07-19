@@ -32,7 +32,7 @@ export default function Page({ products }) {
              <VStack spacing={5}>
                 <Header></Header>
                 <Link href='/cart'>
-                    <Button>Panier</Button>
+                    <Button colorScheme="linkedin" bgColor={"#00b0cb"}>Panier</Button>
                 </Link>
 
                 <Box

@@ -67,11 +67,13 @@ async function commerceToolsProducts(req, res) {
         }
         console.log("rawResults=", rawResults)
         const products = Array.from(rawResults).map(rawResult => {
+            const centPrice = rawResult.masterData.current.masterVariant.prices[0].value.centAmount.toString();
+            const price = centPrice.slice(0, centPrice.length - 2) + "." + centPrice.slice(centPrice.length - 2);
             return {
                 id: rawResult.id,
                 name: rawResult.masterData.current.name,
                 image: rawResult.masterData.current.masterVariant.images[0].url,
-                price: rawResult.masterData.current.masterVariant.prices[0].value.centAmount.toString(),
+                price: price,
                 compare_at_price: null,
                 description: rawResult.masterData.current.description
             }
