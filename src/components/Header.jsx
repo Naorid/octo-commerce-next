@@ -22,8 +22,12 @@ function Header() {
     return (
         <Container>
             {!shopifyMode ? <Box>
-                <div className="menu-principal" style={{display: "flex", alignItems: "center" }}>
-                    <Select id="client-dropdown" maxWidth={"fit-content"} color={"black"} >
+                <div className="menu-principal" style={{
+                    display: "-webkit-inline-box",
+                    position: "absolute",
+                    top: "5px",
+                    right: "50px" }}>
+                    <Select id="client-dropdown" maxWidth={"fit-content"} color={"black"} bgColor={"white"} margin={"5px"}>
                         <option value="AHU">AHU</option>
                         <option value="NATH">NATH</option>
                         <option value="LJA">LJA</option>
@@ -39,13 +43,15 @@ function Header() {
                         <option value="LAWA">LAWA</option>
                         <option value=""></option>
                     </Select>
-                    <Button bgColor={"#00b0cb"} type="submit" onClick={setUser}>Connexion</Button>
+                    <Button bgColor={"#00b0cb"} type="submit" onClick={setUser} margin={"5px"}>Connexion</Button>
+                    <br />
                     <Link href='http://127.0.0.1:5500/octobook-delivery/front/landing.html'>Commandes</Link>
+                    <br />
+                    <Button bgColor={"#00b0cb"} onClick={() => removeCart()}>Input</Button>
                 </div>
             </Box>
                 : <div></div>}
             <img src="/assets/octobook.png" alt="" id="octobook"></img>
-            <Button bgColor={"#00b0cb"} onClick={() => removeCart()}>Input</Button>
         </Container>
     )
 }
