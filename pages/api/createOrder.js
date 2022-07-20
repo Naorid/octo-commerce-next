@@ -191,7 +191,7 @@ async function shopifyOrder(req, res) {
 async function commerceToolsOrder(req, res) {
     const cartId = req.body.cartId
     const shippingAddress = req.body.shippingAddress
-    const polygram = req.body.polygram
+    const delivery_man = req.body.delivery_man
 
     // Get cart version
 
@@ -282,7 +282,7 @@ async function commerceToolsOrder(req, res) {
         .orders()
         .withId({ID: order.id})
         .post({
-            body: commerceToolsCustomTypeQuery(order.version, polygram)
+            body: commerceToolsCustomTypeQuery(order.version, delivery_man)
         })
         .execute()
         .then(result => {

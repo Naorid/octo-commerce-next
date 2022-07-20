@@ -67,7 +67,6 @@ export const CartItem = (props) => {
                     md: 'flex',
                 }}
             >
-                <Text>Quantity={!reload ? quantity : "Loading..."}</Text>
                 <QuantitySelect
                     value={quantity}
                     onChange={(e) => {

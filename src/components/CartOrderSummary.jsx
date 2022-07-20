@@ -92,8 +92,8 @@ export const CartOrderSummary = (props) => {
                 {/*<Link href={"/checkout"}></Link>*/}
 
                 {/*<Link href="/checkout">*/}
-                {/*    Checkout*/}
-                {/*</Link>*/}
+                    Checkout
+                {/*<Link>*/}
             </Button>
         </Stack>
     )

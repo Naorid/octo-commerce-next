@@ -16,8 +16,10 @@ import { Rating } from './Rating'
 import { FavouriteButton } from './FavouriteButton'
 import { PriceTag } from './PriceTag'
 import Router from "next/router";
+import {useState} from "react";
 
-async function addProductToCartButton(productId) {
+async function addProductToCartButton(productId, setIsLoading) {
+    setIsLoading(true)
     console.log("productId", productId)
     // console.log(sessionStorage.getItem('cartId'))
     // call addProductToCart
@@ -36,16 +38,19 @@ async function addProductToCartButton(productId) {
     const cartId = (await rawCartId.json()).data
     console.log(cartId)
     sessionStorage.setItem('cartId', cartId[0] === 'g' ? cartId.toString().split('gid://shopify/Cart/')[1] : cartId)
+    setIsLoading(false)
 }
 
-async function quickBuy(productId) {
-    await addProductToCartButton(productId)
+async function quickBuy(productId, setIsLoading) {
+    await addProductToCartButton(productId, setIsLoading)
     await Router.push("/cart")
 }
 
 export const ProductCard = (props) => {
     const { product, rootProps } = props
     const { name, image, compare_at_price, price } = product
+
+    const [isLoading, setIsLoading] = useState(false)
 
     return (
         <Stack
@@ -87,7 +92,8 @@ export const ProductCard = (props) => {
                 </Stack>
             </Link>
             <Stack align="center">
-                <Button colorScheme="linkedin" bgColor={"#00b0cb"} isFullWidth onClick={() => addProductToCartButton(product.id)}>
+
+                <Button colorScheme="linkedin" isFullWidth isLoading={isLoading} onClick={() => addProductToCartButton(product.id, setIsLoading)}>
                     Ajouter au panier
                 </Button>
                 <Button
@@ -101,7 +107,7 @@ export const ProductCard = (props) => {
                         padding:0,
                         cursor: "pointer"
                     }}
-                    onClick={() => quickBuy(product.id)}
+                    onClick={() => quickBuy(product.id, setIsLoading)}
                 >
                     Achat rapide
                 </Button>

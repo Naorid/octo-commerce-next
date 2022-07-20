@@ -12,6 +12,7 @@ import Header from "../src/components/Header";
 import Footer from "../src/components/Footer"
 import {ProductGrid} from "../src/components/ProductGrid";
 import {ProductCard} from "../src/components/ProductCard";
+import {useState} from "react";
 
 export async function getStaticProps() {
     const rawProducts = await fetch(`http://localhost:3000/api/products`)
@@ -27,12 +28,14 @@ export async function getStaticProps() {
 }
 
 export default function Page({ products }) {
+    const [isLoading, setIsLoading] = useState(false)
+
     return (
         <Box>
              <VStack spacing={5}>
                 <Header></Header>
                 <Link href='/cart'>
-                    <Button colorScheme="linkedin" bgColor={"#00b0cb"}>Panier</Button>
+                    <Button colorScheme="linkedin" isLoading={isLoading} onClick={() => setIsLoading(true)}>Panier</Button>
                 </Link>
 
                 <Box
