@@ -23,3 +23,17 @@ export async function shopifyGraphQL(content) {
         }
     )
 }
+
+export async function shopifyCreateOrder(body) {
+    return await fetch(
+        `${process.env.SHOPIFY_DOMAIN}/admin/api/${process.env.API_VERSION}/orders.json`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Shopify-Access-Token': process.env.ACCESS_TOKEN
+            },
+            body: body
+        }
+    )
+}

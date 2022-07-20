@@ -1,4 +1,4 @@
-import {shopifyGraphQL} from "../../src/utils/apicall";
+import {shopifyCreateOrder, shopifyGraphQL} from "../../src/utils/apicall";
 import {config} from "dotenv"
 import * as util from "util";
 import {apiRoot, projectKey} from "../../src/utils/commerceToolsConfig";
@@ -94,6 +94,98 @@ async function shopifyCheckout(req, res) {
     const checkout = await rawCheckout.json()
     console.log(checkout.data)
     res.json({data: checkout.data})
+}
+
+async function shopifyOrder(req, res) {
+    const cartId = req.body.cartId
+
+    const rawCart = await shopifyGraphQL(
+        `query {
+  cart(
+    id: "gid://shopify/Cart/${cartId}"
+  ) {
+    id
+    createdAt
+    updatedAt
+    lines(first: 10) {
+      edges {
+        node {
+          id
+          quantity
+          merchandise {
+            ... on ProductVariant {
+              id
+            }
+          }
+          attributes {
+            key
+            value
+          }
+        }
+      }
+    }
+    attributes {
+      key
+      value
+    }
+    estimatedCost {
+      totalAmount {
+        amount
+        currencyCode
+      }
+      subtotalAmount {
+        amount
+        currencyCode
+      }
+      totalTaxAmount {
+        amount
+        currencyCode
+      }
+      totalDutyAmount {
+        amount
+        currencyCode
+      }
+    }
+    buyerIdentity {
+      email
+      phone
+      customer {
+        id
+      }
+      countryCode
+    }
+  }
+}`
+    )
+
+    const shopifyCart = (await rawCart.json()).data.cart
+
+    const line_items = shopifyCart.lines.edges.map(e => {
+        return {
+            variant_id: parseInt(e.node.merchandise.id.split('/')[4]),
+            quantity: e.node.quantity
+        }
+    })
+
+    console.log("line_items=", line_items)
+
+    const body = {
+        order: {
+            line_items: line_items
+        }
+    }
+    console.log(body)
+    console.log(body.order.line_items[0])
+
+    const rawOrder = await shopifyCreateOrder(JSON.stringify(body))
+
+    console.log(rawOrder)
+
+    const order = await rawOrder.json()
+
+    console.log(order)
+
+    res.end()
 }
 
 async function commerceToolsOrder(req, res) {
@@ -213,6 +305,6 @@ export default async function handler(req, res) {
         res.end()
         return res
     } else {
-        return await shopifyCheckout(req, res)
+        return await shopifyOrder(req, res)
     }
 }
