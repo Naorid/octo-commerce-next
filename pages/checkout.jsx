@@ -76,6 +76,14 @@ export default function Page() {
                     <label htmlFor="delivery_man">Delivery Man</label>
                     <Input type="text" id="delivery_man" name="delivery_man"/>
                 </div> : <div></div> }
+                <label htmlFor="city">City</label>
+                <Input type="text" id="city" name="city"></Input>
+                <label htmlFor="postalCode">Postal Code</label>
+                <Input type="text" id="postalCode" name="postalCode"></Input>
+                <label htmlFor="streetName">Street Name</label>
+                <Input type="text" id="streetName" name="streetName"></Input>
+                <label htmlFor="streetNumber">Street Number</label>
+                <Input type="text" id="streetNumber" name="streetNumber"></Input>
                 <label htmlFor="country">Country</label>
                 <Select name="country" id="country">
                     <option style={{ color: 'black' }} value="">Select a country</option>

@@ -30,7 +30,7 @@ const commerceToolsShippingAddressQuery = (cartVersion, shippingAddress) =>
     }
 }
 
-const commerceToolsCustomTypeQuery = (orderVersion, polygram) => {
+const commerceToolsCustomTypeQuery = (orderVersion, polygram, email) => {
     return {
         version: orderVersion,
         actions: [
@@ -43,6 +43,10 @@ const commerceToolsCustomTypeQuery = (orderVersion, polygram) => {
                 fields : {
                     polygramme : polygram
                 }
+            },
+            {
+                "action" : "setCustomerEmail",
+                "email" : email
             }
         ]
     }
@@ -189,6 +193,7 @@ async function shopifyOrder(req, res) {
 }
 
 async function commerceToolsOrder(req, res) {
+    console.log(req.body)
     const cartId = req.body.cartId
     const shippingAddress = req.body.shippingAddress
     const delivery_man = req.body.delivery_man
@@ -212,6 +217,8 @@ async function commerceToolsOrder(req, res) {
         })
 
     // Update cart to add shippingAddress
+
+    console.log("ShippingQuery", commerceToolsShippingAddressQuery(cartVersion, shippingAddress).actions)
 
     console.log("Bonjour")
 
@@ -275,14 +282,14 @@ async function commerceToolsOrder(req, res) {
             res.status(400).json(e);
         })
 
-    // Set Octo order custom type
+    // Set Octo order custom type and customer's mail
 
     await apiRoot
         .withProjectKey({ projectKey })
         .orders()
         .withId({ID: order.id})
         .post({
-            body: commerceToolsCustomTypeQuery(order.version, delivery_man)
+            body: commerceToolsCustomTypeQuery(order.version, delivery_man, shippingAddress.email)
         })
         .execute()
         .then(result => {
